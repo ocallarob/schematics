@@ -29,6 +29,12 @@
       "schema": "./lib/decorator/schema.json",
       "aliases": ["d"]
     },
+    "fantastec-resource": {
+      "factory": "./lib/fantastec-resource/filter.factory#main",
+      "description": "Create a Nest filter.",
+      "schema": "./lib/filter/schema.json",
+      "aliases": ["f"]
+    },
     "filter": {
       "factory": "./lib/filter/filter.factory#main",
       "description": "Create a Nest filter.",
