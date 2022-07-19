@@ -33,7 +33,7 @@
       "factory": "./lib/fantastec-resource/filter.factory#main",
       "description": "Create a Nest filter.",
       "schema": "./lib/filter/schema.json",
-      "aliases": ["f"]
+      "aliases": ["fr"]
     },
     "filter": {
       "factory": "./lib/filter/filter.factory#main",
