@@ -30,9 +30,9 @@
       "aliases": ["d"]
     },
     "fantastec-resource": {
-      "factory": "./lib/fantastec-resource/filter.factory#main",
-      "description": "Create a Nest filter.",
-      "schema": "./lib/filter/schema.json",
+      "factory": "./lib/fantastec-resource/fantastec-resource.factory#main",
+      "description": "Create a Fantastec resource.",
+      "schema": "./lib/fantastec-resource/schema.json",
       "aliases": ["fr"]
     },
     "filter": {
