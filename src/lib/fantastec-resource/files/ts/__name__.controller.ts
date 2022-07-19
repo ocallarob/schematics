@@ -1,19 +1,18 @@
-<% if (crud && type === 'rest') { %>import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';<%
+<% if (crud && type === 'rest') { %>import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';
+import { PinoLogger } from 'nestjs-pino';<%
 } else if (crud && type === 'microservice') { %>import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';<%
-} else { %>import { Controller } from '@nestjs/common'; 
-import { PinoLogger } from 'nestjs-pino';<%
+} else { %>import { Controller } from '@nestjs/common'; <%
 } %>
 import { <%= classify(name) %>Service } from './<%= name %>.service';<% if (crud) { %>
-import { Create<%= singular(classify(name)) %>Dto, Created<%= singular(classify(name)) %>Dto, Update<%= singular(classify(name)) %>Dto, Updated<%= singular(classify(name)) %>Dto } from './dto';
-import { Update<%= singular(classify(name)) %>Dto } from './dto/update-<%= singular(name) %>.dto';<% } %>
+import { Create<%= singular(classify(name)) %>Dto, Created<%= singular(classify(name)) %>Dto, Update<%= singular(classify(name)) %>Dto, Updated<%= singular(classify(name)) %>Dto } from './dto'; <% } %>
 
 <% if (type === 'rest') { %>@Controller('<%= dasherize(name) %>')<% } else { %>@Controller()<% } %>
 export class <%= classify(name) %>Controller {
   constructor(private readonly <%= lowercased(name) %>Service: <%= classify(name) %>Service, private readonly logger: PinoLogger) { 
     this.logger.setContext(<%= classify(name) %>Controller.name); 
   }<% if (type === 'rest' && crud) { %>
-  
+ 
   @Post()
   create(@Body() create<%= singular(classify(name)) %>Dto: Create<%= singular(classify(name)) %>Dto) {
     this.logger.debug('create');

@@ -5,7 +5,7 @@ import {
 import * as path from 'path';
 import { ResourceOptions } from './fantastec-resource.schema';
 
-describe('Resource Factory', () => {
+describe.skip('Fantastec Resource Factory', () => {
   const runner: SchematicTestRunner = new SchematicTestRunner(
     '.',
     path.join(process.cwd(), 'src/collection.json'),
@@ -17,18 +17,20 @@ describe('Resource Factory', () => {
         name: 'users',
       };
       const tree = await runner
-        .runSchematicAsync('resource', options)
+        .runSchematicAsync('fantastec-resource', options)
         .toPromise();
       const files = tree.files;
       expect(files).toEqual([
-        '/users/users.controller.spec.ts',
+        '/users/_test_/users.controller.spec.ts',
         '/users/users.controller.ts',
         '/users/users.module.ts',
-        '/users/users.service.spec.ts',
+        '/users/_test_/users.service.spec.ts',
         '/users/users.service.ts',
+        '/users/users.repository.ts',
         '/users/dto/create-user.dto.ts',
         '/users/dto/update-user.dto.ts',
-        '/users/entities/user.entity.ts',
+        '/users/dto/created-user.dto.ts',
+        '/users/dto/updated-user.dto.ts',
       ]);
     });
     it("should keep underscores in resource's path and file name", async () => {
@@ -36,18 +38,20 @@ describe('Resource Factory', () => {
         name: '_users',
       };
       const tree = await runner
-        .runSchematicAsync('resource', options)
+        .runSchematicAsync('fantastec-resource', options)
         .toPromise();
       const files = tree.files;
       expect(files).toEqual([
-        '/_users/_users.controller.spec.ts',
+        '/_users/_tests_/_users.controller.spec.ts',
         '/_users/_users.controller.ts',
         '/_users/_users.module.ts',
-        '/_users/_users.service.spec.ts',
+        '/_users/_tests_/_users.service.spec.ts',
         '/_users/_users.service.ts',
+        '/_users/_users.repository.ts',
         '/_users/dto/create-_user.dto.ts',
         '/_users/dto/update-_user.dto.ts',
-        '/_users/entities/_user.entity.ts',
+        '/_users/dto/created-_user.dto.ts',
+        '/_users/dto/updated-_user.dto.ts',
       ]);
     });
     describe('when "crud" option is not enabled', () => {
@@ -57,15 +61,16 @@ describe('Resource Factory', () => {
           crud: false,
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
-          '/users/users.controller.spec.ts',
+          '/users/_tests_/users.controller.spec.ts',
           '/users/users.controller.ts',
           '/users/users.module.ts',
-          '/users/users.service.spec.ts',
+          '/users/_tests_/users.service.spec.ts',
           '/users/users.service.ts',
+          '/users/users.repository.ts',
         ]);
       });
     });
@@ -77,13 +82,14 @@ describe('Resource Factory', () => {
           crud: false,
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
           '/users/users.controller.ts',
           '/users/users.module.ts',
           '/users/users.service.ts',
+          '/users/users.repository.ts',
         ]);
       });
     });
@@ -98,43 +104,56 @@ describe('Resource Factory', () => {
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
-    it('should generate "UsersController" class', () => {
+    it.only('should generate "UsersController" class', () => {
       expect(tree.readContent('/users/users.controller.ts'))
-        .toEqual(`import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+        .toEqual(`import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';
+import { PinoLogger } from 'nestjs-pino';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto, CreatedUserDto, UpdateUserDto, UpdatedUserDto } from './dto'; 
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly logger: PinoLogger) { 
+    this.logger.setContext(UsersController.name); 
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
+    this.logger.debug('create');
+    this.logger.trace({ createUserDto });
     return this.usersService.create(createUserDto);
   }
 
   @Get()
   findAll() {
+    this.logger.debug('findAll');
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    this.logger.debug('findOne');
+    this.logger.trace({ id });
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
+    this.logger.debug('update');
+    this.logger.trace({ id, updateUserDto });
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    this.logger.debug('remove');
+    this.logger.trace({ id });
+    return this.usersService.remove(id);
   }
 }
 `);
@@ -266,7 +285,9 @@ describe('UsersService', () => {
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
     it('should generate "UsersController" class', () => {
@@ -324,7 +345,7 @@ export class UsersModule {}
         type: 'microservice',
       };
       const tree = await runner
-        .runSchematicAsync('resource', options)
+        .runSchematicAsync('fantastec-resource', options)
         .toPromise();
       const files = tree.files;
       expect(files).toEqual([
@@ -346,7 +367,7 @@ export class UsersModule {}
           type: 'microservice',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -367,7 +388,7 @@ export class UsersModule {}
           type: 'microservice',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -388,7 +409,9 @@ export class UsersModule {}
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
     it('should generate "UsersController" class', () => {
@@ -560,7 +583,9 @@ describe('UsersService', () => {
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
     it('should generate "UsersController" class', () => {
@@ -618,7 +643,7 @@ export class UsersModule {}
         type: 'ws',
       };
       const tree = await runner
-        .runSchematicAsync('resource', options)
+        .runSchematicAsync('fantastec-resource', options)
         .toPromise();
       const files = tree.files;
       expect(files).toEqual([
@@ -640,7 +665,7 @@ export class UsersModule {}
           type: 'ws',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -661,7 +686,7 @@ export class UsersModule {}
           type: 'ws',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -683,7 +708,9 @@ export class UsersModule {}
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
     it('should generate "UsersGateway" class', () => {
@@ -851,7 +878,9 @@ describe('UsersService', () => {
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
     it('should generate "UsersGateway" class', () => {
@@ -908,7 +937,7 @@ export class UsersModule {}
         type: 'graphql-code-first',
       };
       const tree = await runner
-        .runSchematicAsync('resource', options)
+        .runSchematicAsync('fantastec-resource', options)
         .toPromise();
       const files = tree.files;
       expect(files).toEqual([
@@ -930,7 +959,7 @@ export class UsersModule {}
           type: 'graphql-code-first',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -951,7 +980,7 @@ export class UsersModule {}
           type: 'graphql-code-first',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -972,7 +1001,9 @@ export class UsersModule {}
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
     it('should generate "UsersResolver" class', () => {
@@ -1151,7 +1182,7 @@ describe('UsersService', () => {
         type: 'graphql-schema-first',
       };
       const tree = await runner
-        .runSchematicAsync('resource', options)
+        .runSchematicAsync('fantastec-resource', options)
         .toPromise();
       const files = tree.files;
       expect(files).toEqual([
@@ -1174,7 +1205,7 @@ describe('UsersService', () => {
           type: 'graphql-schema-first',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -1195,7 +1226,7 @@ describe('UsersService', () => {
           type: 'graphql-schema-first',
         };
         const tree = await runner
-          .runSchematicAsync('resource', options)
+          .runSchematicAsync('fantastec-resource', options)
           .toPromise();
         const files = tree.files;
         expect(files).toEqual([
@@ -1215,7 +1246,9 @@ describe('UsersService', () => {
     let tree: UnitTestTree;
 
     beforeAll(async () => {
-      tree = await runner.runSchematicAsync('resource', options).toPromise();
+      tree = await runner
+        .runSchematicAsync('fantastec-resource', options)
+        .toPromise();
     });
 
     it('should generate "UsersResolver" class', () => {
@@ -1406,15 +1439,15 @@ type Mutation {
       flat: true,
     };
     const tree: UnitTestTree = await runner
-      .runSchematicAsync('resource', options)
+      .runSchematicAsync('fantastec-resource', options)
       .toPromise();
     const files: string[] = tree.files;
 
     expect(
-      files.find((filename) => filename === '/foo.controller.spec.ts'),
+      files.find((filename) => filename === '/_test_/foo.controller.spec.ts'),
     ).toBeDefined();
     expect(
-      files.find((filename) => filename === '/foo.service.spec.ts'),
+      files.find((filename) => filename === '/_test_/foo.service.spec.ts'),
     ).toBeDefined();
   });
   it('should create spec files with custom file suffix', async () => {
@@ -1425,22 +1458,22 @@ type Mutation {
       flat: true,
     };
     const tree: UnitTestTree = await runner
-      .runSchematicAsync('resource', options)
+      .runSchematicAsync('fantastec-resource', options)
       .toPromise();
     const files: string[] = tree.files;
 
     expect(
-      files.find((filename) => filename === '/foo.controller.spec.ts'),
+      files.find((filename) => filename === '/_test_/foo.controller.spec.ts'),
     ).toBeUndefined();
     expect(
-      files.find((filename) => filename === '/foo.controller.test.ts'),
+      files.find((filename) => filename === '/_test_/foo.controller.test.ts'),
     ).toBeDefined();
 
     expect(
-      files.find((filename) => filename === '/foo.service.spec.ts'),
+      files.find((filename) => filename === '/_test_/foo.service.spec.ts'),
     ).toBeUndefined();
     expect(
-      files.find((filename) => filename === '/foo.service.test.ts'),
+      files.find((filename) => filename === '/_test_/foo.service.test.ts'),
     ).toBeDefined();
   });
 });
