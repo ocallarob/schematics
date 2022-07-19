@@ -1,41 +1,51 @@
-<% if (crud && type === 'rest') { %>import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';<%
+<% if (crud && type === 'rest') { %>import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';<%
 } else if (crud && type === 'microservice') { %>import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';<%
-} else { %>import { Controller } from '@nestjs/common';<%
+} else { %>import { Controller } from '@nestjs/common'; 
+import { PinoLogger } from 'nestjs-pino';<%
 } %>
 import { <%= classify(name) %>Service } from './<%= name %>.service';<% if (crud) { %>
-import { Create<%= singular(classify(name)) %>Dto } from './dto/create-<%= singular(name) %>.dto';
+import { Create<%= singular(classify(name)) %>Dto, Created<%= singular(classify(name)) %>Dto, Update<%= singular(classify(name)) %>Dto, Updated<%= singular(classify(name)) %>Dto } from './dto';
 import { Update<%= singular(classify(name)) %>Dto } from './dto/update-<%= singular(name) %>.dto';<% } %>
 
 <% if (type === 'rest') { %>@Controller('<%= dasherize(name) %>')<% } else { %>@Controller()<% } %>
 export class <%= classify(name) %>Controller {
-  constructor(private readonly <%= lowercased(name) %>Service: <%= classify(name) %>Service) {}<% if (type === 'rest' && crud) { %>
+  constructor(private readonly <%= lowercased(name) %>Service: <%= classify(name) %>Service, private readonly logger: PinoLogger) { 
+    this.logger.setContext(<%= classify(name) %>Controller.name); 
+  }<% if (type === 'rest' && crud) { %>
   
-  console.log('boobs');
-
   @Post()
   create(@Body() create<%= singular(classify(name)) %>Dto: Create<%= singular(classify(name)) %>Dto) {
+    this.logger.debug('create');
+    this.logger.trace({ create<%= singular(classify(name)) %>Dto });
     return this.<%= lowercased(name) %>Service.create(create<%= singular(classify(name)) %>Dto);
   }
 
   @Get()
   findAll() {
+    this.logger.debug('findAll');
     return this.<%= lowercased(name) %>Service.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.<%= lowercased(name) %>Service.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    this.logger.debug('findOne');
+    this.logger.trace({ id });
+    return this.<%= lowercased(name) %>Service.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() update<%= singular(classify(name)) %>Dto: Update<%= singular(classify(name)) %>Dto) {
-    return this.<%= lowercased(name) %>Service.update(+id, update<%= singular(classify(name)) %>Dto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() update<%= singular(classify(name)) %>Dto: Update<%= singular(classify(name)) %>Dto) {
+    this.logger.debug('update');
+    this.logger.trace({ id, update<%= singular(classify(name)) %>Dto });
+    return this.<%= lowercased(name) %>Service.update(id, update<%= singular(classify(name)) %>Dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.<%= lowercased(name) %>Service.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    this.logger.debug('remove');
+    this.logger.trace({ id });
+    return this.<%= lowercased(name) %>Service.remove(id);
   }<% } else if (type === 'microservice' && crud) { %>
 
   @MessagePattern('create<%= singular(classify(name)) %>')
