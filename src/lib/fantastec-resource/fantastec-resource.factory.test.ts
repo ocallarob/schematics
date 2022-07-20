@@ -5,7 +5,7 @@ import {
 import * as path from 'path';
 import { ResourceOptions } from './fantastec-resource.schema';
 
-describe.skip('Fantastec Resource Factory', () => {
+describe('Fantastec Resource Factory', () => {
   const runner: SchematicTestRunner = new SchematicTestRunner(
     '.',
     path.join(process.cwd(), 'src/collection.json'),
@@ -110,6 +110,9 @@ describe.skip('Fantastec Resource Factory', () => {
     });
 
     it.only('should generate "UsersController" class', () => {
+      const repo = tree.readContent('/users/users.repository.ts');
+      console.log({ repo });
+
       expect(tree.readContent('/users/users.controller.ts'))
         .toEqual(`import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';
 import { PinoLogger } from 'nestjs-pino';

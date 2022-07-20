@@ -1,5 +1,6 @@
 <% if (crud && type === 'rest') { %>import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';
-import { PinoLogger } from 'nestjs-pino';<%
+import { PinoLogger } from 'nestjs-pino';
+<%
 } else if (crud && type === 'microservice') { %>import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';<%
 } else { %>import { Controller } from '@nestjs/common'; <%
@@ -14,34 +15,34 @@ export class <%= classify(name) %>Controller {
   }<% if (type === 'rest' && crud) { %>
  
   @Post()
-  create(@Body() create<%= singular(classify(name)) %>Dto: Create<%= singular(classify(name)) %>Dto) {
+  create(@Body() create<%= singular(classify(name)) %>Dto: Create<%= singular(classify(name)) %>Dto): Promise<Created<%= singular(classify(name)) %>Dto> {
     this.logger.debug('create');
     this.logger.trace({ create<%= singular(classify(name)) %>Dto });
     return this.<%= lowercased(name) %>Service.create(create<%= singular(classify(name)) %>Dto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Created<%= singular(classify(name)) %>Dto[]> {
     this.logger.debug('findAll');
     return this.<%= lowercased(name) %>Service.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Created<%= singular(classify(name)) %>Dto> {
     this.logger.debug('findOne');
     this.logger.trace({ id });
     return this.<%= lowercased(name) %>Service.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() update<%= singular(classify(name)) %>Dto: Update<%= singular(classify(name)) %>Dto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() update<%= singular(classify(name)) %>Dto: Update<%= singular(classify(name)) %>Dto): Promise<Updated<%= singular(classify(name)) %>Dto> {
     this.logger.debug('update');
     this.logger.trace({ id, update<%= singular(classify(name)) %>Dto });
     return this.<%= lowercased(name) %>Service.update(id, update<%= singular(classify(name)) %>Dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<Created<%= singular(classify(name)) %>Dto> {
     this.logger.debug('remove');
     this.logger.trace({ id });
     return this.<%= lowercased(name) %>Service.remove(id);

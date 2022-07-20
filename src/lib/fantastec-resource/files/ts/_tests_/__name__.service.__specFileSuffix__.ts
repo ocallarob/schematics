@@ -1,18 +1,129 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { <%= classify(name) %>Service } from './<%= name %>.service';
+
+import { LoggerModule } from 'nestjs-pino';
+import { <%= classify(name) %>Repository } from '../<%= lowercased(name) %>.repository';
+import { <%= classify(name) %>Service } from '../<%= lowercased(name) %>.service';
+import { Create<%= singular(classify(name)) %>Dto, Created<%= singular(classify(name)) %>Dto, Update<%= singular(classify(name)) %>Dto } from '../dto';
+import {
+  create<%= singular(classify(name)) %>DtoStub,
+  created<%= singular(classify(name)) %>DtoStub,
+  update<%= singular(classify(name)) %>DtoStub,
+  updated<%= singular(classify(name)) %>DtoStub,
+} from './stubs';
+
+// TODO: Update _mocks_ -> __mocks__
+// TODO: Update _tests_ -> __tests__ 
+jest.mock('../<%= lowercased(name) %>.repository');
 
 describe('<%= classify(name) %>Service', () => {
-  let service: <%= classify(name) %>Service;
+  let <%= lowercased(name) %>Service: <%= classify(name) %>Service;
+  let <%= lowercased(name) %>Repo: <%= classify(name) %>Repository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [<%= classify(name) %>Service],
+      controllers: [<%= classify(name) %>Service],
+      providers: [<%= classify(name) %>Repository],
+      imports: [
+        LoggerModule.forRoot({
+          pinoHttp: {
+            name: 'fantastec-swap-api',
+            level: 'fatal',
+          },
+        }),
+      ],
     }).compile();
 
-    service = module.get<<%= classify(name) %>Service>(<%= classify(name) %>Service);
+    <%= lowercased(name) %>Service = module.get<<%= classify(name) %>Service>(<%= classify(name) %>Service);
+    <%= lowercased(name) %>Repo = module.get<<%= classify(name) %>Repository>(<%= classify(name) %>Repository);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe(`create`, () => {
+    const create<%= singular(classify(name)) %>: Create<%= singular(classify(name)) %>Dto = create<%= singular(classify(name)) %>DtoStub();
+
+    describe(`when create is called`, () => {
+      it(`should call <%= lowercased(name) %>Repo`, async () => {
+        await <%= lowercased(name) %>Service.create(create<%= singular(classify(name)) %>);
+        expect(<%= lowercased(name) %>Repo.create).toHaveBeenCalledWith(create<%= singular(classify(name)) %>);
+      });
+      it(`should return a <%= singular(lowercased(name)) %>`, async () => {
+        expect(<%= lowercased(name) %>Service.create(create<%= singular(classify(name)) %>)).resolves.toEqual(
+          created<%= singular(classify(name)) %>DtoStub(),
+        );
+      });
+    });
+  });
+
+  describe(`findOne`, () => {
+    describe(`when findOne is called`, () => {
+      it(`should call <%= lowercased(name) %>Repo`, async () => {
+        await <%= lowercased(name) %>Service.findOne(1);
+        expect(<%= lowercased(name) %>Repo.findById).toHaveBeenCalledWith(1);
+      });
+      it(`should return a <%= singular(lowercased(name)) %>`, async () => {
+        expect(
+          <%= lowercased(name) %>Service.findOne(created<%= singular(classify(name)) %>DtoStub().id),
+        ).resolves.toEqual(created<%= singular(classify(name)) %>DtoStub());
+      });
+    });
+  });
+
+  describe(`findAll`, () => {
+    describe(`when findAll is called`, () => {
+      it(`should call <%= lowercased(name) %>Repo`, async () => {
+        await <%= lowercased(name) %>Service.findAll();
+        expect(<%= lowercased(name) %>Repo.find).toHaveBeenCalled();
+      });
+      it(`should return a <%= singular(lowercased(name)) %> array`, async () => {
+        expect(<%= lowercased(name) %>Service.findAll()).resolves.toEqual([
+          created<%= singular(classify(name)) %>DtoStub(),
+        ]);
+      });
+    });
+  });
+
+  describe(`listGender`, () => {
+    describe(`when listGender is called`, () => {
+      it(`should call <%= lowercased(name) %>Repo`, async () => {
+        <%= lowercased(name) %>Service.listGender();
+        expect(<%= lowercased(name) %>Repo.listGender).toHaveBeenCalled();
+      });
+      it(`should return an <%= singular(lowercased(name)) %> array`, async () => {
+        expect(<%= lowercased(name) %>Service.listGender()).toBeDefined();
+      });
+    });
+  });
+
+  describe(`update`, () => {
+    const created<%= singular(classify(name)) %>: Created<%= singular(classify(name)) %>Dto = created<%= singular(classify(name)) %>DtoStub();
+    const update<%= singular(classify(name)) %>: Update<%= singular(classify(name)) %>Dto = update<%= singular(classify(name)) %>DtoStub();
+
+    describe(`when update is called`, () => {
+      it(`should call <%= lowercased(name) %>Repo`, async () => {
+        await <%= lowercased(name) %>Service.update(created<%= singular(classify(name)) %>.id, update<%= singular(classify(name)) %>);
+        expect(<%= lowercased(name) %>Repo.updateById).toHaveBeenCalledWith(
+          created<%= singular(classify(name)) %>.id,
+          update<%= singular(classify(name)) %>,
+        );
+      });
+      it(`should return a <%= singular(lowercased(name)) %>`, async () => {
+        expect(
+          <%= lowercased(name) %>Service.update(created<%= singular(classify(name)) %>.id, update<%= singular(classify(name)) %>),
+        ).resolves.toEqual(updated<%= singular(classify(name)) %>DtoStub());
+      });
+    });
+  });
+
+  describe(`remove`, () => {
+    describe(`when remove is called`, () => {
+      it(`should call <%= lowercased(name) %>Repo`, async () => {
+        await <%= lowercased(name) %>Service.remove(created<%= singular(classify(name)) %>DtoStub().id);
+        expect(<%= lowercased(name) %>Repo.deleteById).toHaveBeenCalled();
+      });
+      it(`should return the deleted <%= singular(lowercased(name)) %>`, async () => {
+        expect(
+          <%= lowercased(name) %>Service.remove(created<%= singular(classify(name)) %>DtoStub().id),
+        ).resolves.toEqual(created<%= singular(classify(name)) %>DtoStub());
+      });
+    });
   });
 });

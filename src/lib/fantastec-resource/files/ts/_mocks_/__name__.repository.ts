@@ -1,14 +1,9 @@
-import { Gender } from '@prisma/client';
-import { createdAthleteDtoStub } from '../__tests__/stubs';
+import { created<%= singular(classify(name)) %>DtoStub } from '../__tests__/stubs';
 
-export const AthletesRepository = jest.fn().mockReturnValue({
-  create: jest.fn().mockResolvedValue(createdAthleteDtoStub()),
-  findOne: jest.fn().mockResolvedValue(createdAthleteDtoStub()),
-  findById: jest.fn().mockResolvedValue(createdAthleteDtoStub()),
-  find: jest.fn().mockResolvedValue([createdAthleteDtoStub()]),
-  update: jest.fn().mockResolvedValue(createdAthleteDtoStub()),
-  updateById: jest.fn().mockResolvedValue(createdAthleteDtoStub()),
-  delete: jest.fn().mockResolvedValue(createdAthleteDtoStub()),
-  deleteById: jest.fn().mockResolvedValue(createdAthleteDtoStub()),
-  listGender: jest.fn().mockReturnValue(Object.keys(Gender)),
+export const <%= classify(name) %>Repository = jest.fn().mockReturnValue({
+  create: jest.fn().mockResolvedValue(created<%= singular(classify(name)) %>DtoStub()),
+  findById: jest.fn().mockResolvedValue(created<%= singular(classify(name)) %>DtoStub()),
+  find: jest.fn().mockResolvedValue([created<%= singular(classify(name)) %>DtoStub()]),
+  updateById: jest.fn().mockResolvedValue(created<%= singular(classify(name)) %>DtoStub()),
+  deleteById: jest.fn().mockResolvedValue(created<%= singular(classify(name)) %>DtoStub()),
 });

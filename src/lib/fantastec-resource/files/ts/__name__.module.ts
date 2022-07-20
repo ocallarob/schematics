@@ -1,9 +1,15 @@
 import { Module } from '@nestjs/common';
-import { <%= classify(name) %>Service } from './<%= name %>.service';
-<% if (type === 'rest' || type === 'microservice') { %>import { <%= classify(name) %>Controller } from './<%= name %>.controller';<% } %><% if (type === 'graphql-code-first' || type === 'graphql-schema-first') { %>import { <%= classify(name) %>Resolver } from './<%= name %>.resolver';<% } %><% if (type === 'ws') { %>import { <%= classify(name) %>Gateway } from './<%= name %>.gateway';<% } %>
+
+import { PrismaService } from '../database';
+
+import { <%= classify(name) %>Controller } from './<%= lowercased(name) %>.controller';
+import { <%= classify(name) %>Repository } from './<%= lowercased(name) %>.repository';
+import { <%= classify(name) %>Service } from './<%= lowercased(name) %>.service';
 
 @Module({
-  <% if (type === 'rest' || type === 'microservice') { %>controllers: [<%= classify(name) %>Controller],
-  providers: [<%= classify(name) %>Service]<% } else if (type === 'graphql-code-first' || type === 'graphql-schema-first') { %>providers: [<%= classify(name) %>Resolver, <%= classify(name) %>Service]<% } else { %>providers: [<%= classify(name) %>Gateway, <%= classify(name) %>Service]<% } %>
+  controllers: [<%= classify(name) %>Controller],
+  providers: [<%= classify(name) %>Service, <%= classify(name) %>Repository, PrismaService],
+  // imports: [], // TODO: Import and Dependency Modules if required
+  // exports: [<%= classify(name) %>Service, <%= classify(name) %>Repository], // TODO: Export and Providers used elsewhere if required
 })
 export class <%= classify(name) %>Module {}
