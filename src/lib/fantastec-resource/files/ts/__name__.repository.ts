@@ -12,14 +12,16 @@
   <% } else if (crud) { %>
   import { Create<%= singular(classify(name)) %>Input } from './dto/create-<%= singular(name) %>.input';
   import { Update<%= singular(classify(name)) %>Input } from './dto/update-<%= singular(name) %>.input';<% } %>
+
+  const notFoundMessage = `<%= singular(classify(name)) %> not found`;
   
   @Injectable()
-  export class <%= classify(name) %>Service {<% if (crud) { %>
+  export class <%= classify(name) %>Repository {<% if (crud) { %>
     constructor(
       private prisma: PrismaService,
       private readonly logger: PinoLogger
     ) { 
-      this.logger.setContext(<%= classify(name) %>Service.name); 
+      this.logger.setContext(<%= classify(name) %>Repository.name); 
     }
 
     async create(data: Prisma.<%= singular(classify(name)) %>CreateInput): Promise< <%= singular(classify(name)) %> > {
