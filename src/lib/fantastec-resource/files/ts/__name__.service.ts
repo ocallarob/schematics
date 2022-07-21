@@ -31,7 +31,7 @@ export class <%= classify(name) %>Service {
   findOne(id: number): Promise<Created<%= singular(classify(name)) %>Dto> {
     this.logger.debug('findOne');
     this.logger.trace({ id });
-    return this.<%= singular(lowercased(name)) %>Repo.findById(id);
+    return this.<%= lowercased(name) %>Repo.findById(id);
   }
   update(
     id: number,
