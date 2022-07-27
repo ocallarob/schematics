@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PinoLogger } from 'nestjs-pino';
-import { <%= classify(name) %>Repository } from './<%= lowercased(name) %>.repository';
+import { <%= classify(name) %>Repository } from './<%= name %>.repository';
 import {
   Create<%= singular(classify(name)) %>Dto,
   Created<%= singular(classify(name)) %>Dto,

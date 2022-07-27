@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoggerModule, PinoLogger } from 'nestjs-pino';
-import { <%= classify(name) %>Controller } from '../<%= lowercased(name) %>.controller';
-import { <%= classify(name) %>Service } from '../<%= lowercased(name) %>.service';
+import { <%= classify(name) %>Controller } from '../<%= name %>.controller';
+import { <%= classify(name) %>Service } from '../<%= name %>.service';
 import { Create<%= singular(classify(name)) %>Dto, Created<%= singular(classify(name)) %>Dto, Update<%= singular(classify(name)) %>Dto } from '../dto';
 import {
   create<%= singular(classify(name)) %>DtoStub,
@@ -10,7 +10,7 @@ import {
   updated<%= singular(classify(name)) %>DtoStub,
 } from './stubs';
 
-jest.mock('../<%= lowercased(name) %>.service');
+jest.mock('../<%= name %>.service');
 
 describe('<%= classify(name) %>Controller', () => {
   let <%= lowercased(name) %>Controller: <%= classify(name) %>Controller;

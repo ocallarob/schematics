@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { LoggerModule } from 'nestjs-pino';
-import { <%= classify(name) %>Repository } from '../<%= lowercased(name) %>.repository';
-import { <%= classify(name) %>Service } from '../<%= lowercased(name) %>.service';
+import { <%= classify(name) %>Repository } from '../<%= name %>.repository';
+import { <%= classify(name) %>Service } from '../<%= name %>.service';
 import { Create<%= singular(classify(name)) %>Dto, Created<%= singular(classify(name)) %>Dto, Update<%= singular(classify(name)) %>Dto } from '../dto';
 import {
   create<%= singular(classify(name)) %>DtoStub,
@@ -13,7 +13,7 @@ import {
 
 // TODO: Update _mocks_ -> __mocks__
 // TODO: Update _tests_ -> __tests__ 
-jest.mock('../<%= lowercased(name) %>.repository');
+jest.mock('../<%= name %>.repository');
 
 describe('<%= classify(name) %>Service', () => {
   let <%= lowercased(name) %>Service: <%= classify(name) %>Service;

@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 
 import { PrismaService } from '../database';
 
-import { <%= classify(name) %>Controller } from './<%= lowercased(name) %>.controller';
-import { <%= classify(name) %>Repository } from './<%= lowercased(name) %>.repository';
-import { <%= classify(name) %>Service } from './<%= lowercased(name) %>.service';
+import { <%= classify(name) %>Controller } from './<%= name %>.controller';
+import { <%= classify(name) %>Repository } from './<%= name %>.repository';
+import { <%= classify(name) %>Service } from './<%= name %>.service';
 
 @Module({
   controllers: [<%= classify(name) %>Controller],

@@ -1,1 +1,1 @@
-export * from './<%= singular(lowercased(name)) %>.dto.stub';
+export * from './<%= singular(name) %>.dto.stub';
