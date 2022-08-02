@@ -11,8 +11,6 @@ import {
   updated<%= singular(classify(name)) %>DtoStub,
 } from './stubs';
 
-// TODO: Update _mocks_ -> __mocks__
-// TODO: Update _tests_ -> __tests__ 
 jest.mock('../<%= name %>.repository');
 
 describe('<%= classify(name) %>Service', () => {
@@ -77,18 +75,6 @@ describe('<%= classify(name) %>Service', () => {
         expect(<%= lowercased(name) %>Service.findAll()).resolves.toEqual([
           created<%= singular(classify(name)) %>DtoStub(),
         ]);
-      });
-    });
-  });
-
-  describe(`listGender`, () => {
-    describe(`when listGender is called`, () => {
-      it(`should call <%= lowercased(name) %>Repo`, async () => {
-        <%= lowercased(name) %>Service.listGender();
-        expect(<%= lowercased(name) %>Repo.listGender).toHaveBeenCalled();
-      });
-      it(`should return an <%= singular(lowercased(name)) %> array`, async () => {
-        expect(<%= lowercased(name) %>Service.listGender()).toBeDefined();
       });
     });
   });

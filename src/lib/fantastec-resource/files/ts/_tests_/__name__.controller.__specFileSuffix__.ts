@@ -111,13 +111,4 @@ describe('<%= classify(name) %>Controller', () => {
       });
     });
   });
-
-  describe(`listGender`, () => {
-    describe(`when listGender is called`, () => {
-      it('should call <%= lowercased(name) %>Service - listGender', () => {
-        <%= lowercased(name) %>Controller.listGender();
-        expect(<%= lowercased(name) %>Service.listGender).toHaveBeenCalled();
-      });
-    });
-  });
 });

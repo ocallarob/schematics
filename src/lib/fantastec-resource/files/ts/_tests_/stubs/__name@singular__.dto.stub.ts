@@ -16,10 +16,7 @@ const defaults: Created<%= singular(classify(name)) %>Dto = {
 
 export const create<%= singular(classify(name)) %>DtoStub = ({}: // <%= singular(classify(name)) %> properties
 Partial<Create<%= singular(classify(name)) %>Dto> = {}): Create<%= singular(classify(name)) %>Dto => ({
-  firstName: firstName || defaults.firstName,
-  lastName: lastName || defaults.lastName,
-  displayName: displayName || defaults.displayName,
-  gender: gender || defaults.gender,
+  // <%= singular(classify(name)) %> properties
 });
 
 export const created<%= singular(classify(name)) %>DtoStub = ({
